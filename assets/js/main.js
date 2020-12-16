@@ -1,5 +1,5 @@
 /*
-	Urban by TEMPLATED
+	Binary by TEMPLATED
 	templated.co @templatedco
 	Released for free under the Creative Commons Attribution 3.0 license (templated.co/license)
 */
@@ -18,8 +18,7 @@
 
 		var	$window = $(window),
 			$body = $('body'),
-			$header = $('#header'),
-			$banner = $('#banner');
+			$header = $('#header');
 
 		// Disable animations/transitions until the page has loaded.
 			$body.addClass('is-loading');
@@ -33,12 +32,22 @@
 		// Fix: Placeholder polyfill.
 			$('form').placeholder();
 
+		// Fix: IE.
+			if (skel.vars.browser == 'ie')
+				$body.addClass('is-ie');
+
 		// Prioritize "important" elements on medium.
 			skel.on('+medium -medium', function() {
 				$.prioritize(
 					'.important\\28 medium\\29',
 					skel.breakpoint('medium').active
 				);
+			});
+
+		// Scrolly.
+			$('.scrolly').scrolly({
+				speed: 1000,
+				offset: $header.outerHeight() -1
 			});
 
 		// Menu.
@@ -54,108 +63,22 @@
 					side: 'right'
 				});
 
-		// Header.
-			if (skel.vars.IEVersion < 9)
-				$header.removeClass('alt');
+		// Posts.
+			var $posts = $('.post');
 
-			if ($banner.length > 0
-			&&	$header.hasClass('alt')) {
+			$posts.each(function() {
 
-				$window.on('resize', function() { $window.trigger('scroll'); });
+				var $this = $(this),
+					$image = $this.find('.image'), $img = $image.find('img'),
+					x;
 
-				$banner.scrollex({
-					bottom:		$header.outerHeight(),
-					terminate:	function() { $header.removeClass('alt'); },
-					enter:		function() { $header.addClass('alt'); },
-					leave:		function() { $header.removeClass('alt'); $header.addClass('reveal'); }
-				});
+				// Set image.
+					$image.css('background-image', 'url(' + $img.attr('src') + ')');
 
-			}
+				// Set position.
+					if (x = $img.data('position'))
+						$image.css('background-position', x);
 
-		// Banner.
-			var $banner = $('#banner');
-
-			if ($banner.length > 0) {
-
-				// IE fix.
-					if (skel.vars.IEVersion < 12) {
-
-						$window.on('resize', function() {
-
-							var wh = $window.height() * 0.60,
-								bh = $banner.height();
-
-							$banner.css('height', 'auto');
-
-							window.setTimeout(function() {
-
-								if (bh < wh)
-									$banner.css('height', wh + 'px');
-
-							}, 0);
-
-						});
-
-						$window.on('load', function() {
-							$window.triggerHandler('resize');
-						});
-
-					}
-
-				// Video check.
-					var video = $banner.data('video');
-
-					if (video)
-						$window.on('load.banner', function() {
-
-							// Disable banner load event (so it doesn't fire again).
-								$window.off('load.banner');
-
-							// Append video if supported.
-								if (!skel.vars.mobile
-								&&	!skel.breakpoint('large').active
-								&&	skel.vars.IEVersion > 9)
-									$banner.append('<video autoplay loop><source src="' + video + '.mp4" type="video/mp4" /><source src="' + video + '.webm" type="video/webm" /></video>');
-
-						});
-
-				// More button.
-					$banner.find('.more')
-						.addClass('scrolly');
-
-			}
-
-		// Tabs.
-			$('.flex-tabs').each( function() {
-
-				var t = jQuery(this),
-					tab = t.find('.tab-list li a'),
-					tabs = t.find('.tab');
-
-				tab.click(function(e) {
-
-					var x = jQuery(this),
-						y = x.data('tab');
-
-					// Set Classes on Tabs
-						tab.removeClass('active');
-						x.addClass('active');
-
-					// Show/Hide Tab Content
-						tabs.removeClass('active');
-						t.find('.' + y).addClass('active');
-
-					e.preventDefault();
-
-				});
-
-			});
-
-		// Scrolly.
-			$('.scrolly').scrolly({
-				offset: function() {
-					return $header.height() - 2;
-				}
 			});
 
 	});
